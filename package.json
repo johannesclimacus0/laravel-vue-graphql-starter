@@ -12,7 +12,7 @@
         "test:watch": "vp test --watch"
     },
     "dependencies": {
-        "@tailwindcss/vite": "^4.1.11",
+        "@tailwindcss/vite": "^4.3.5",
         "@vitejs/plugin-vue": "^6.0.0",
         "axios": "^1.20.0",
         "concurrently": "^10.0.3",
