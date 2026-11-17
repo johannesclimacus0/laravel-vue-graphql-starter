@@ -1,0 +1,47 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vp build",
+        "dev": "vp dev",
+        "check": "vp check",
+        "check:fix": "vp check --fix",
+        "types:check": "php artisan wayfinder:generate && vue-tsc --noEmit",
+        "test": "vp test",
+        "test:watch": "vp test --watch"
+    },
+    "dependencies": {
+        "@tailwindcss/vite": "^4.1.11",
+        "@vitejs/plugin-vue": "^6.0.0",
+        "axios": "^1.20.0",
+        "concurrently": "^10.0.3",
+        "laravel-vite-plugin": "^3.1",
+        "pinia": "^4.0.3",
+        "tailwindcss": "^4.1.1",
+        "typescript": "^5.2.2",
+        "vue": "^3.5.13",
+        "vue-router": "^5.3.1"
+    },
+    "devDependencies": {
+        "@laravel/echo-vue": "^2.6.1",
+        "@laravel/vite-plugin-wayfinder": "^0.1.10",
+        "@types/node": "^22.13.5",
+        "@vue/test-utils": "^2.5.1",
+        "jsdom": "^29.1.1",
+        "laravel-echo": "^2.6.1",
+        "pusher-js": "^8.6.0",
+        "vite-plus": "1.7.0",
+        "vue-tsc": "^3.3.14"
+    },
+    "optionalDependencies": {
+        "@laravel/multiplex": "^0.4.1",
+        "@rollup/rollup-linux-x64-gnu": "4.9.5",
+        "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
+        "lightningcss-linux-x64-gnu": "^1.29.1"
+    },
+    "overrides": {
+        "shell-quote": "1.12.0",
+        "vite": "npm:@voidzero-dev/vite-plus-core@8.3.8000"
+    }
+}
