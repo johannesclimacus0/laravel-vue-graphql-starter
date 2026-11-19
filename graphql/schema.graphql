@@ -1,16 +1,13 @@
-scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+#import scalars.graphql
+#import preferences.graphql
+#import security.graphql
 
 type Query {
     me: User @auth
-    myPreferences: UserPreferences! @guard @verified
-    mySecuritySettings: SecuritySettings! @guard @verified
 }
 
 type Mutation {
     updateMyProfile(input: UpdateMyProfileInput!): User! @guard
-    updateMyPreferences(input: UpdateMyPreferencesInput!): UserPreferences! @guard @verified
-    updateMyPassword(input: UpdateMyPasswordInput!): Boolean! @guard
-    deleteMyAccount(input: DeleteMyAccountInput!): Boolean! @guard
 }
 
 type User {
@@ -20,32 +17,7 @@ type User {
     emailVerifiedAt: DateTime @rename(attribute: "email_verified_at")
 }
 
-type UserPreferences {
-    timezone: String!
-}
-
 input UpdateMyProfileInput {
     name: String! @trim
     email: String! @trim
-}
-
-type SecuritySettings {
-    canManageTwoFactor: Boolean!
-    twoFactorEnabled: Boolean!
-    requiresConfirmation: Boolean!
-    passwordRules: String!
-}
-
-input UpdateMyPreferencesInput {
-    timezone: String! @trim
-}
-
-input UpdateMyPasswordInput {
-    current_password: String!
-    password: String!
-    password_confirmation: String!
-}
-
-input DeleteMyAccountInput {
-    password: String!
 }

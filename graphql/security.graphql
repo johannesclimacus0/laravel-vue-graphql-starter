@@ -1,0 +1,25 @@
+extend type Query {
+    mySecuritySettings: SecuritySettings! @guard @verified
+}
+
+extend type Mutation {
+    updateMyPassword(input: UpdateMyPasswordInput!): Boolean! @guard
+    deleteMyAccount(input: DeleteMyAccountInput!): Boolean! @guard
+}
+
+type SecuritySettings {
+    canManageTwoFactor: Boolean!
+    twoFactorEnabled: Boolean!
+    requiresConfirmation: Boolean!
+    passwordRules: String!
+}
+
+input UpdateMyPasswordInput {
+    current_password: String!
+    password: String!
+    password_confirmation: String!
+}
+
+input DeleteMyAccountInput {
+    password: String!
+}
