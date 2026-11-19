@@ -1,6 +1,3 @@
-export type SecuritySettings = {
-    canManageTwoFactor: boolean;
-    twoFactorEnabled: boolean;
-    requiresConfirmation: boolean;
-    passwordRules: string;
-};
+import type { MySecuritySettingsQuery } from '@/graphql/generated/graphql';
+
+export type SecuritySettings = MySecuritySettingsQuery['mySecuritySettings'];

@@ -5,6 +5,7 @@ import {
     normalizeApiError,
     notifyUnauthenticated,
 } from '@/http/http';
+import type { TypedDocumentString } from '@/graphql/generated/graphql';
 import type { LaravelValidationErrors, NormalizedApiError } from '@/types/http';
 
 type GraphQLError = {
@@ -86,8 +87,8 @@ function normalizeGraphQLErrors(errors: GraphQLError[], status: number): Normali
     };
 }
 
-export async function graphql<TData, TVariables extends object = Record<string, never>>(
-    query: string,
+export async function graphql<TData, TVariables extends object>(
+    document: TypedDocumentString<TData, TVariables>,
     variables: TVariables,
     options: GraphQLRequestOptions = {},
 ): Promise<TData> {
@@ -97,7 +98,7 @@ export async function graphql<TData, TVariables extends object = Record<string, 
         const response = await http.post<GraphQLResponse<TData>>(
             '/graphql',
             {
-                query,
+                query: document.toString(),
                 variables,
                 ...(options.operationName ? { operationName: options.operationName } : {}),
             },

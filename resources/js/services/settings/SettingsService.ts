@@ -1,4 +1,15 @@
 import { graphql } from '@/graphql/client';
+import {
+    DeleteMyAccountDocument,
+    MyPreferencesDocument,
+    MySecuritySettingsDocument,
+    UpdateMyPasswordDocument,
+    UpdateMyPreferencesDocument,
+    UpdateMyProfileDocument,
+    type DeleteMyAccountInput,
+    type UpdateMyPasswordInput,
+    type UpdateMyProfileInput,
+} from '@/graphql/generated/graphql';
 import { http, isRequestAborted, normalizeApiError } from '@/http/http';
 import type { PasswordConfirmationStatus } from '@/types/auth/session';
 import type { UserPreferences } from '@/types/settings/preferences';
@@ -9,37 +20,14 @@ export type { UserPreferences } from '@/types/settings/preferences';
 export type { SecuritySettings } from '@/types/settings/security';
 export type { PasswordConfirmationStatus } from '@/types/auth/session';
 
-type MyPreferencesData = {
-    myPreferences: UserPreferences;
-};
-
 export class SettingsService {
-    async updateProfile(payload: { name: string; email: string }): Promise<void> {
-        await graphql<{ updateMyProfile: { id: string } }, { input: typeof payload }>(
-            `
-                mutation UpdateMyProfile($input: UpdateMyProfileInput!) {
-                    updateMyProfile(input: $input) {
-                        id
-                    }
-                }
-            `,
-            { input: payload },
-            { csrf: true },
-        );
+    async updateProfile(payload: UpdateMyProfileInput): Promise<void> {
+        await graphql(UpdateMyProfileDocument, { input: payload }, { csrf: true });
     }
 
     async updatePreferences(preferences: UserPreferences): Promise<UserPreferences> {
-        const data = await graphql<
-            { updateMyPreferences: UserPreferences },
-            { input: UserPreferences }
-        >(
-            `
-                mutation UpdateMyPreferences($input: UpdateMyPreferencesInput!) {
-                    updateMyPreferences(input: $input) {
-                        timezone
-                    }
-                }
-            `,
+        const data = await graphql(
+            UpdateMyPreferencesDocument,
             { input: preferences },
             { csrf: true },
         );
@@ -47,43 +35,17 @@ export class SettingsService {
         return data.updateMyPreferences;
     }
 
-    async updatePassword(payload: {
-        current_password: string;
-        password: string;
-        password_confirmation: string;
-    }): Promise<void> {
-        await graphql<{ updateMyPassword: boolean }, { input: typeof payload }>(
-            `
-                mutation UpdateMyPassword($input: UpdateMyPasswordInput!) {
-                    updateMyPassword(input: $input)
-                }
-            `,
-            { input: payload },
-            { csrf: true },
-        );
+    async updatePassword(payload: UpdateMyPasswordInput): Promise<void> {
+        await graphql(UpdateMyPasswordDocument, { input: payload }, { csrf: true });
     }
 
-    async deleteAccount(payload: { password: string }): Promise<void> {
-        await graphql<{ deleteMyAccount: boolean }, { input: typeof payload }>(
-            `
-                mutation DeleteMyAccount($input: DeleteMyAccountInput!) {
-                    deleteMyAccount(input: $input)
-                }
-            `,
-            { input: payload },
-            { csrf: true },
-        );
+    async deleteAccount(payload: DeleteMyAccountInput): Promise<void> {
+        await graphql(DeleteMyAccountDocument, { input: payload }, { csrf: true });
     }
 
     async fetchPreferences(options?: { signal?: AbortSignal }): Promise<UserPreferences> {
-        const data = await graphql<MyPreferencesData>(
-            `
-                query MyPreferences {
-                    myPreferences {
-                        timezone
-                    }
-                }
-            `,
+        const data = await graphql(
+            MyPreferencesDocument,
             {},
             { signal: options?.signal, csrf: true },
         );
@@ -92,17 +54,8 @@ export class SettingsService {
     }
 
     async fetchSecuritySettings(options?: { signal?: AbortSignal }): Promise<SecuritySettings> {
-        const data = await graphql<{ mySecuritySettings: SecuritySettings }>(
-            `
-                query MySecuritySettings {
-                    mySecuritySettings {
-                        canManageTwoFactor
-                        twoFactorEnabled
-                        requiresConfirmation
-                        passwordRules
-                    }
-                }
-            `,
+        const data = await graphql(
+            MySecuritySettingsDocument,
             {},
             { signal: options?.signal, csrf: true },
         );

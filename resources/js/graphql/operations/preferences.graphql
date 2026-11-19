@@ -1,0 +1,11 @@
+query MyPreferences {
+    myPreferences {
+        timezone
+    }
+}
+
+mutation UpdateMyPreferences($input: UpdateMyPreferencesInput!) {
+    updateMyPreferences(input: $input) {
+        timezone
+    }
+}

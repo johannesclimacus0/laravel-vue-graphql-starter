@@ -10,36 +10,17 @@ import { send as resendVerificationEmailRoute } from '@/routes/verification';
 import { store as twoFactorChallengeRoute } from '@/routes/two-factor/login';
 import { logout as logoutRoute } from '@/routes';
 import { graphql } from '@/graphql/client';
+import { CurrentUserDocument } from '@/graphql/generated/graphql';
 import type { User } from '@/types/auth/index';
 import type { AuthStatusResponse as StatusResponse, LoginResult } from '@/types/auth/service';
 
 export type { LoginResult } from '@/types/auth/service';
 
-type CurrentUserData = {
-    me: {
-        id: string;
-        name: string;
-        email: string;
-        email_verified_at: string | null;
-    } | null;
-};
-
-const CURRENT_USER_QUERY = `
-    query CurrentUser {
-        me {
-            id
-            name
-            email
-            email_verified_at: emailVerifiedAt
-        }
-    }
-`;
-
 export class AuthService {
     async fetchCurrentUser(options?: { signal?: AbortSignal }): Promise<User | null> {
         try {
-            const data = await graphql<CurrentUserData>(
-                CURRENT_USER_QUERY,
+            const data = await graphql(
+                CurrentUserDocument,
                 {},
                 { signal: options?.signal, csrf: true },
             );

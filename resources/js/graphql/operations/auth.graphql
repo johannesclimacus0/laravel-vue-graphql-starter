@@ -1,0 +1,8 @@
+query CurrentUser {
+    me {
+        id
+        name
+        email
+        email_verified_at: emailVerifiedAt
+    }
+}
