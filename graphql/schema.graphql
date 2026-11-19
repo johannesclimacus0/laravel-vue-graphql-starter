@@ -1,0 +1,23 @@
+#import scalars.graphql
+#import preferences.graphql
+#import security.graphql
+
+type Query {
+    me: User @auth
+}
+
+type Mutation {
+    updateMyProfile(input: UpdateMyProfileInput!): User! @guard
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    emailVerifiedAt: DateTime @rename(attribute: "email_verified_at")
+}
+
+input UpdateMyProfileInput {
+    name: String! @trim
+    email: String! @trim
+}

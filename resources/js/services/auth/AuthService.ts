@@ -9,36 +9,42 @@ import { store as registerRoute } from '@/routes/register';
 import { send as resendVerificationEmailRoute } from '@/routes/verification';
 import { store as twoFactorChallengeRoute } from '@/routes/two-factor/login';
 import { logout as logoutRoute } from '@/routes';
-import { user } from '@/routes/api/v1';
+import { graphql } from '@/graphql/client';
+import { CurrentUserDocument } from '@/graphql/generated/graphql';
 import type { User } from '@/types/auth/index';
-import type {
-    AuthStatusResponse as StatusResponse,
-    LoginResult,
-    UserResponse,
-} from '@/types/auth/service';
-import axios from 'axios';
+import type { AuthStatusResponse as StatusResponse, LoginResult } from '@/types/auth/service';
 
 export type { LoginResult } from '@/types/auth/service';
 
 export class AuthService {
     async fetchCurrentUser(options?: { signal?: AbortSignal }): Promise<User | null> {
         try {
-            const response = await http.request<UserResponse>({
-                ...user(),
-                signal: options?.signal,
-            });
+            const data = await graphql(
+                CurrentUserDocument,
+                {},
+                { signal: options?.signal, csrf: true },
+            );
 
-            return response.data.data;
+            if (data.me === null) {
+                return null;
+            }
+
+            return {
+                ...data.me,
+                id: Number(data.me.id),
+            };
         } catch (error) {
             if (isRequestAborted(error)) {
                 throw error;
             }
 
-            if (axios.isAxiosError(error) && error.response?.status === 401) {
+            const normalized = normalizeApiError(error);
+
+            if (normalized.kind === 'unauthenticated') {
                 return null;
             }
 
-            throw normalizeApiError(error);
+            throw normalized;
         }
     }
 

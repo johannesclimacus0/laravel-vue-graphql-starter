@@ -1,0 +1,16 @@
+query MySecuritySettings {
+    mySecuritySettings {
+        canManageTwoFactor
+        twoFactorEnabled
+        requiresConfirmation
+        passwordRules
+    }
+}
+
+mutation UpdateMyPassword($input: UpdateMyPasswordInput!) {
+    updateMyPassword(input: $input)
+}
+
+mutation DeleteMyAccount($input: DeleteMyAccountInput!) {
+    deleteMyAccount(input: $input)
+}

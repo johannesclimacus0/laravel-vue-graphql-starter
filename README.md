@@ -52,10 +52,12 @@ The Sail stack includes PostgreSQL, Redis, Mailpit, Horizon, Reverb, and a sched
 ## Features
 
 - Auth: Fortify, Sanctum, registration, login, password reset, email verification, 2FA, recovery codes
-- Settings: profile, password, security, time zone, account deletion
+- GraphQL: Lighthouse API for current user, profile, password, security, time zone, and account deletion
 - Frontend: Vue 3, TypeScript, Vue Router, Pinia, Axios, Tailwind CSS, Wayfinder
 - Realtime: Reverb and Echo configuration
 - Checks: Pest, Vitest, PHPStan, Pint, CI
+
+## GraphQL/Lighthouse
 
 ## Credits
 

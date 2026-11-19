@@ -1,98 +1,66 @@
-import { ensureCsrfCookie, http, isRequestAborted, normalizeApiError } from '@/http/http';
+import { graphql } from '@/graphql/client';
+import {
+    DeleteMyAccountDocument,
+    MyPreferencesDocument,
+    MySecuritySettingsDocument,
+    UpdateMyPasswordDocument,
+    UpdateMyPreferencesDocument,
+    UpdateMyProfileDocument,
+    type DeleteMyAccountInput,
+    type UpdateMyPasswordInput,
+    type UpdateMyProfileInput,
+} from '@/graphql/generated/graphql';
+import { http, isRequestAborted, normalizeApiError } from '@/http/http';
 import type { PasswordConfirmationStatus } from '@/types/auth/session';
-import type { MaybeWrapped } from '@/types/settings/api';
-import type { UserPreferences, UserPreferencesResponse } from '@/types/settings/preferences';
+import type { UserPreferences } from '@/types/settings/preferences';
 import type { SecuritySettings } from '@/types/settings/security';
 import { confirmation as confirmedPasswordStatusRoute } from '@/routes/password';
-import { destroy as deleteProfileRoute } from '@/routes/profile';
-import { update as updateUserPasswordRoute } from '@/routes/user-password';
-import { update as updateProfileRoute } from '@/routes/user-profile-information';
-import { security } from '@/routes/api/v1/settings';
-import {
-    show as showPreferencesRoute,
-    update as updatePreferencesRoute,
-} from '@/routes/api/v1/settings/preferences';
 
 export type { UserPreferences } from '@/types/settings/preferences';
 export type { SecuritySettings } from '@/types/settings/security';
 export type { PasswordConfirmationStatus } from '@/types/auth/session';
 
-function unwrap<T>(payload: MaybeWrapped<T>): T {
-    if (
-        typeof payload === 'object' &&
-        payload !== null &&
-        'data' in payload &&
-        typeof (payload as { data: unknown }).data === 'object'
-    ) {
-        return (payload as { data: T }).data;
-    }
-
-    return payload as T;
-}
-
 export class SettingsService {
-    async updateProfile(payload: { name: string; email: string }): Promise<void> {
-        await ensureCsrfCookie();
-        await http.request({ ...updateProfileRoute(), data: payload });
+    async updateProfile(payload: UpdateMyProfileInput): Promise<void> {
+        await graphql(UpdateMyProfileDocument, { input: payload }, { csrf: true });
     }
 
     async updatePreferences(preferences: UserPreferences): Promise<UserPreferences> {
-        await ensureCsrfCookie();
+        const data = await graphql(
+            UpdateMyPreferencesDocument,
+            { input: preferences },
+            { csrf: true },
+        );
 
-        const response = await http.request<UserPreferencesResponse>({
-            ...updatePreferencesRoute(),
-            data: preferences,
-        });
-
-        return response.data.data;
+        return data.updateMyPreferences;
     }
 
-    async updatePassword(payload: {
-        current_password: string;
-        password: string;
-        password_confirmation: string;
-    }): Promise<void> {
-        await ensureCsrfCookie();
-        await http.request({ ...updateUserPasswordRoute(), data: payload });
+    async updatePassword(payload: UpdateMyPasswordInput): Promise<void> {
+        await graphql(UpdateMyPasswordDocument, { input: payload }, { csrf: true });
     }
 
-    async deleteAccount(payload: { password: string }): Promise<void> {
-        await ensureCsrfCookie();
-        await http.request({ ...deleteProfileRoute(), data: payload });
+    async deleteAccount(payload: DeleteMyAccountInput): Promise<void> {
+        await graphql(DeleteMyAccountDocument, { input: payload }, { csrf: true });
     }
 
     async fetchPreferences(options?: { signal?: AbortSignal }): Promise<UserPreferences> {
-        try {
-            const response = await http.request<UserPreferencesResponse>({
-                ...showPreferencesRoute(),
-                signal: options?.signal,
-            });
+        const data = await graphql(
+            MyPreferencesDocument,
+            {},
+            { signal: options?.signal, csrf: true },
+        );
 
-            return response.data.data;
-        } catch (error) {
-            if (isRequestAborted(error)) {
-                throw error;
-            }
-
-            throw normalizeApiError(error);
-        }
+        return data.myPreferences;
     }
 
     async fetchSecuritySettings(options?: { signal?: AbortSignal }): Promise<SecuritySettings> {
-        try {
-            const response = await http.request<MaybeWrapped<SecuritySettings>>({
-                ...security(),
-                signal: options?.signal,
-            });
+        const data = await graphql(
+            MySecuritySettingsDocument,
+            {},
+            { signal: options?.signal, csrf: true },
+        );
 
-            return unwrap(response.data);
-        } catch (error) {
-            if (isRequestAborted(error)) {
-                throw error;
-            }
-
-            throw normalizeApiError(error);
-        }
+        return data.mySecuritySettings;
     }
 
     async fetchPasswordConfirmationStatus(options?: {

@@ -70,6 +70,7 @@ export default defineConfig({
             'node_modules/**',
             'public/**',
             'bootstrap/ssr/**',
+            'resources/js/graphql/generated/**',
             'tailwind.config.js',
         ],
         options: {
@@ -86,6 +87,8 @@ export default defineConfig({
         htmlWhitespaceSensitivity: 'css',
         ignorePatterns: [
             '.github/**',
+            'graphql/generated/**',
+            'resources/js/graphql/generated/**',
             'composer.json',
             'resources/views/mail/*',
             'resources/js/router/index.ts',

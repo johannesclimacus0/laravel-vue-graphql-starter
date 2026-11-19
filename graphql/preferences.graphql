@@ -1,0 +1,15 @@
+extend type Query {
+    myPreferences: UserPreferences! @guard @verified
+}
+
+extend type Mutation {
+    updateMyPreferences(input: UpdateMyPreferencesInput!): UserPreferences! @guard @verified
+}
+
+type UserPreferences {
+    timezone: String!
+}
+
+input UpdateMyPreferencesInput {
+    timezone: String! @trim
+}
