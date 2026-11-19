@@ -6,7 +6,6 @@ namespace App\GraphQL\Queries;
 
 use App\Actions\Settings\GetUserSecuritySettings;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final readonly class MySecuritySettings
@@ -21,10 +20,6 @@ final readonly class MySecuritySettings
     {
         /** @var User $user */
         $user = $context->user();
-
-        if (! $user->hasVerifiedEmail()) {
-            throw new AuthorizationException('Email address is not verified');
-        }
 
         return $this->action->get($user);
     }

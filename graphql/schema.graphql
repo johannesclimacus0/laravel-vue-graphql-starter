@@ -2,13 +2,13 @@ scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date
 
 type Query {
     me: User @auth
-    myPreferences: UserPreferences! @guard
-    mySecuritySettings: SecuritySettings! @guard
+    myPreferences: UserPreferences! @guard @verified
+    mySecuritySettings: SecuritySettings! @guard @verified
 }
 
 type Mutation {
     updateMyProfile(input: UpdateMyProfileInput!): User! @guard
-    updateMyPreferences(input: UpdateMyPreferencesInput!): UserPreferences! @guard
+    updateMyPreferences(input: UpdateMyPreferencesInput!): UserPreferences! @guard @verified
     updateMyPassword(input: UpdateMyPasswordInput!): Boolean! @guard
     deleteMyAccount(input: DeleteMyAccountInput!): Boolean! @guard
 }

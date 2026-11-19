@@ -6,7 +6,6 @@ namespace App\GraphQL\Mutations;
 
 use App\Actions\Settings\UpdateUserPreferences;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final readonly class UpdateMyPreferences
@@ -21,10 +20,6 @@ final readonly class UpdateMyPreferences
     {
         /** @var User $user */
         $user = $context->user();
-
-        if (! $user->hasVerifiedEmail()) {
-            throw new AuthorizationException('Email address is not verified');
-        }
 
         $this->action->update($user, $args['input']);
 
