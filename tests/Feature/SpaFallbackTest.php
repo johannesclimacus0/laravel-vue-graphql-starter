@@ -58,7 +58,7 @@ test('redirects two-factor-challenge to login without pending challenge', functi
 });
 
 test('does not swallow api routes with the spa fallback', function () {
-    $response = $this->getJson('/api/v1/user');
+    $response = $this->getJson('/api/v1/user/confirmed-password-status');
 
     $response->assertUnauthorized();
     $response->assertJsonMissingPath('id');

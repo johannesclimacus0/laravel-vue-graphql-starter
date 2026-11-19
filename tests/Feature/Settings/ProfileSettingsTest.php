@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 test('authenticated users can update their profile', function () {
     $user = User::factory()->create();
@@ -48,53 +47,4 @@ test('guests cannot update profile information', function () {
         'name' => 'Guest',
         'email' => 'guest@example.com',
     ])->assertUnauthorized();
-});
-
-test('authenticated verified users can delete their account', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-    ]);
-
-    $response = $this->actingAs($user)->deleteJson('/api/v1/settings/profile', [
-        'password' => 'password',
-    ]);
-
-    $response->assertNoContent();
-    $this->assertGuest();
-    expect($user->fresh())->toBeNull();
-});
-
-test('account deletion requires the correct password', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-    ]);
-
-    $this->actingAs($user)
-        ->deleteJson('/api/v1/settings/profile', [
-            'password' => 'wrong-password',
-        ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['password']);
-
-    expect($user->fresh())->not->toBeNull();
-});
-
-test('guests cannot delete an account', function () {
-    $this->deleteJson('/api/v1/settings/profile', [
-        'password' => 'password',
-    ])->assertUnauthorized();
-});
-
-test('unverified users can delete their own account', function () {
-    $user = User::factory()->unverified()->create([
-        'password' => Hash::make('password'),
-    ]);
-
-    $response = $this->actingAs($user)->deleteJson('/api/v1/settings/profile', [
-        'password' => 'password',
-    ]);
-
-    $response->assertNoContent();
-    $this->assertGuest();
-    expect($user->fresh())->toBeNull();
 });

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\Settings\DeleteAccountController;
 use App\Http\Controllers\Web\SpaController;
 use App\Http\Controllers\Web\TwoFactorChallengeSpaController;
 use Illuminate\Support\Facades\Route;
@@ -33,19 +32,6 @@ Route::get('/verify-email', SpaController::class)
 Route::get('/two-factor-challenge', TwoFactorChallengeSpaController::class)
     ->middleware('guest')
     ->name('two-factor.login');
-
-/*
-| Account deletion requires authentication and current-password confirmation.
-| Unlike the official Inertia kit (which also gates destroy behind verified),
-| unverified users may delete their own account so they can remove personal
-| data without completing email verification first.
-*/
-Route::middleware(['auth'])
-    ->prefix(config('app.api_prefix', 'api/v1'))
-    ->group(function (): void {
-        Route::delete('/settings/profile', DeleteAccountController::class)
-            ->name('profile.destroy');
-    });
 
 /*
 |--------------------------------------------------------------------------
