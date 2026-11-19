@@ -1,3 +1,4 @@
 {
-    "preset": "laravel"
+    "preset": "laravel",
+    "notName": ["_lighthouse_ide_helper.php"]
 }

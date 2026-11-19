@@ -1,4 +1,10 @@
-import { ensureCsrfCookie, http, isRequestAborted, normalizeApiError } from '@/http/http';
+import {
+    ensureCsrfCookie,
+    http,
+    isRequestAborted,
+    normalizeApiError,
+    notifyUnauthenticated,
+} from '@/http/http';
 import type { LaravelValidationErrors, NormalizedApiError } from '@/types/http';
 
 type GraphQLError = {
@@ -86,7 +92,7 @@ export async function graphql<TData, TVariables extends object = Record<string, 
     options: GraphQLRequestOptions = {},
 ): Promise<TData> {
     try {
-        if (options.csrf) await ensureCsrfCookie();
+        if (options.csrf) await ensureCsrfCookie(options.signal);
 
         const response = await http.post<GraphQLResponse<TData>>(
             '/graphql',
@@ -102,7 +108,11 @@ export async function graphql<TData, TVariables extends object = Record<string, 
         const payload = response.data;
 
         if (payload.errors?.length) {
-            throw normalizeGraphQLErrors(payload.errors, response.status);
+            const error = normalizeGraphQLErrors(payload.errors, response.status);
+            if (error.kind === 'unauthenticated') {
+                notifyUnauthenticated();
+            }
+            throw error;
         }
 
         if (payload.data === undefined || payload.data === null) {

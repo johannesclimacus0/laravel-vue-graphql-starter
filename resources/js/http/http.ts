@@ -192,6 +192,12 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
     };
 }
 
+export function notifyUnauthenticated(): void {
+    if (!authSessionHandlersSuppressed) {
+        authSessionHandlers.onUnauthenticated?.();
+    }
+}
+
 function shouldSkipAuthSessionHandlers(error: AxiosError): boolean {
     const config = error.config as RequestConfigWithAuthMeta | undefined;
 
@@ -221,7 +227,7 @@ http.interceptors.response.use(
             const status = error.response?.status;
 
             if (status === 401) {
-                authSessionHandlers.onUnauthenticated?.();
+                notifyUnauthenticated();
             }
         }
 
@@ -234,6 +240,6 @@ http.interceptors.response.use(
  *
  * @see https://laravel.com/docs/sanctum#csrf-protection
  */
-export async function ensureCsrfCookie(): Promise<void> {
-    await http.request(csrfCookie());
+export async function ensureCsrfCookie(signal?: AbortSignal): Promise<void> {
+    await http.request({ ...csrfCookie(), signal });
 }

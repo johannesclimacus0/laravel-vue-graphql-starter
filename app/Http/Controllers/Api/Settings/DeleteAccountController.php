@@ -2,26 +2,19 @@
 
 namespace App\Http\Controllers\Api\Settings;
 
+use App\Actions\Settings\DeleteUserAccount;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 
 class DeleteAccountController extends Controller
 {
     /**
      * Delete the authenticated user's account and invalidate the session.
      */
-    public function __invoke(ProfileDeleteRequest $request): Response
+    public function __invoke(ProfileDeleteRequest $request, DeleteUserAccount $action): Response
     {
-        $user = $request->user();
-
-        Auth::guard('web')->logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $action->delete($request->user(), $request->validated(), $request);
 
         return response()->noContent();
     }

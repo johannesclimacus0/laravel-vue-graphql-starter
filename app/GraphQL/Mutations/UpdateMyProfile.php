@@ -6,8 +6,8 @@ namespace App\GraphQL\Mutations;
 
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\User;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Access\AuthorizationException;
+use Laravel\Fortify\Features;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final readonly class UpdateMyProfile
@@ -17,12 +17,16 @@ final readonly class UpdateMyProfile
     ) {}
 
     /**
-     * @param array{input: array{name: string, email: string}} $args
+     * @param  array{input: array{name: string, email: string}}  $args
      */
-    public function __invoke(mixed $root, array $args): User
+    public function __invoke(mixed $root, array $args, GraphQLContext $context): User
     {
+        if (! Features::enabled(Features::updateProfileInformation())) {
+            throw new AuthorizationException;
+        }
+
         /** @var User $user */
-        $user = Auth::user();
+        $user = $context->user();
 
         $this->action->update($user, $args['input']);
 
